@@ -1,0 +1,31 @@
+---
+import "../styles/global.css";
+import Layout from "../layouts/Layout.astro";
+import ProjectsSection from "../components/home-sections/ProjectsSection.astro";
+import Background3DAnimation from "../components/Background3DAnimation.astro";
+import ProfileCard from "../components/cards/ProfileCard.astro";
+import Terminal from "../components/Terminal.astro";
+import GameSection from "../components/home-sections/card-game-section/GameSection.astro";
+import TechnologiesSection from "../components/home-sections/TechnologiesSection.astro";
+import ContactSection from "../components/home-sections/ContactSection.astro";
+
+// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
+// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+---
+
+<Layout title="Home">
+  <Background3DAnimation />
+  <ProfileCard
+    image="/images/mi-foto.png"
+    name="Caiqui Viera"
+    position="Full Stack Web Developer"
+    description="Passionate about creating scalable web solutions, with a focus on user experience and best development practices. I look for challenging projects that generate impact."
+    ctaText="¡Let's Talk!"
+    ctaLink="/contact"
+  />
+  <Terminal />
+  <ProjectsSection />
+  <GameSection client:load />
+  <TechnologiesSection />
+  <ContactSection />
+</Layout>

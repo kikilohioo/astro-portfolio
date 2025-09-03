@@ -1,0 +1,86 @@
+---
+import { Icon } from "astro-icon/components";
+
+const ctas = [
+  {
+    label: "Email Me",
+    href: "mailto:vieracaiqui@gmail.com",
+    gradient: "from-pink-500 to-red-500",
+    icon: "email",
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/caiquiviera",
+    gradient: "from-blue-500 to-indigo-600",
+    icon: "linkedin",
+  },
+  {
+    label: "GitHub",
+    href: "https://github.com/caiqui-viera",
+    gradient: "from-gray-700 to-black",
+    icon: "github",
+  },
+  {
+    label: "WhatsApp",
+    href: "https://wa.me/59895448562",
+    gradient: "from-green-500 to-emerald-600",
+    icon: "whatsapp",
+  },
+];
+---
+
+<section
+  id="contact"
+  class="section relative min-h-screen w-full flex flex-col items-center justify-center px-6 py-20
+         bg-gradient-to-br from-purple-900/90 via-pink-800/70 to-transparent
+         text-white"
+  data-color="transparent"
+  data-header-color="#46ecd5"
+>
+  <div class="max-w-3xl w-full text-center flex flex-col gap-10">
+    <!-- Título -->
+    <h2 class="text-4xl md:text-5xl font-extrabold tracking-wide">
+      Let's Work <span
+        class="bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent"
+        >Together</span
+      >
+    </h2>
+
+    <!-- Slogan -->
+    <p class="text-xl italic opacity-90">
+      “Transforming ideas into <span class="text-pink-400 font-semibold"
+        >scalable</span
+      > and
+      <span class="text-purple-400 font-semibold">impactful</span> solutions.”
+    </p>
+
+    <!-- Texto de contexto -->
+    <p class="text-lg opacity-80">
+      I’m always open to exciting collaborations, freelance projects, or new job
+      opportunities. Reach out through your preferred channel below 👇
+    </p>
+
+    <!-- CTAs -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+      {
+        ctas.map((cta) => (
+          <div
+            class={`flex rounded-2xl w-full justify-center px-6 py-4 text-xl font-semibold shadow-lg 
+                  bg-gradient-to-r ${cta.gradient} 
+                  hover:scale-105 hover:shadow-2xl transition-transform text-center cursor-pointer items-center`}
+          >
+            <Icon name={cta.icon} size={40} />
+            <a
+              href={cta.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-2xl ml-5 text-center"
+            >
+              {cta.label}
+            </a>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

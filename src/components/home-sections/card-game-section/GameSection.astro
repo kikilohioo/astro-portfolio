@@ -1,0 +1,184 @@
+---
+import Game from "./Game";
+import Score from "./Score";
+import Leaderboard from "./Leaderboard";
+import { Icon } from "astro-icon/components";
+---
+
+<details
+  id="game-section"
+  class="relative w-full bg-transparent group"
+  data-style-class="fixed inset-0 z-50 w-full h-full "
+>
+  <summary
+    id="game-summary"
+    class="relative bg-teal-500 backdrop-blur-sm
+           p-4 rounded-lg text-white flex items-center justify-between
+           transition-all duration-500 ease-in-out
+           z-20 group-open:-z-10 group-open:-translate-y-200 group-open:opacity-70"
+  >
+    <span class="text-4xl text-center w-full py-10 font-semibold">
+      Bored? Take 2 minutes for a game!
+    </span>
+    <Icon
+      id="expand-game-button"
+      name="chevron-down"
+      size={50}
+      class="transition-transform duration-300 cursor-pointer group-open:rotate-180 mr-10"
+    />
+  </summary>
+
+  <section
+    class="section w-full flex flex-col items-center justify-between p-8 md:p-12
+           mt-6 bg-transparent relative z-10
+           transition-all duration-500 ease-in-out"
+    data-color="transparent"
+    data-header-color="#46ecd5"
+  >
+    <div class="flex flex-row items-center justify-center w-full mb-10">
+      <Icon name="gameboy" size={50} />
+      <h1 class="text-4xl font-bold text-teal-300 mb-1 ms-3">Let's play</h1>
+    </div>
+
+    <div class="grid grid-cols-[30%_40%_30%] gap-4 w-full mb-8">
+      <Score client:load />
+      <Game client:load />
+      <Leaderboard client:load />
+    </div>
+    <div class="absolute top-0 right-5 flex felx-col gap-2">
+      <button
+        id="btn-maximize-game"
+        class="rounded-lg bg-teal-600 p-2 hover:bg-teal-400
+             text-white font-semibold shadow-md transition cursor-pointer"
+      >
+        <Icon name="fullscreen" size={30} />
+      </button>
+      <button
+        id="btn-normalize-game"
+        class="rounded-lg bg-teal-600 p-2 hover:bg-teal-400
+             text-white font-semibold shadow-md transition cursor-pointer hidden"
+      >
+        <Icon name="normalscreen" size={30} />
+      </button>
+      <button
+        id="btn-minimize-game"
+        class="rounded-lg bg-red-600 p-2 hover:bg-red-400
+             text-white font-semibold shadow-md transition cursor-pointer"
+      >
+        <Icon
+          name="minimize_terminal"
+          size={30}
+        />
+      </button>
+    </div>
+  </section>
+</details>
+
+<script type="module">
+  window.addEventListener("DOMContentLoaded", () => {
+    const maximizeGameBtn = document.getElementById("btn-maximize-game");
+    const normalizeGameBtn = document.getElementById("btn-normalize-game");
+    let game = document.getElementById("game-section");
+    const minimizeGameBtn = document.getElementById("btn-minimize-game");
+    const expandGameBtn = document.getElementById("expand-game-button");
+    const fallback = document.getElementById("game-summary"); // opcional si querés otro destino
+
+    if (!game || !minimizeGameBtn || !fallback || !expandGameBtn) return;
+
+    // Suaviza el scroll global (opcional si ya lo tienes)
+    document.documentElement.style.scrollBehavior = "smooth";
+
+    function toggleScreenButton () {
+      console.log("ejecutando");
+      
+      const isMaximized = game.dataset.maximized === "true";
+
+      if (!isMaximized) {
+        console.log("no max");
+
+        // Guardar clases originales
+        game.dataset.originalClass = game.className;
+
+        // Maximizar
+        game.className = `
+        fixed inset-0 z-50 w-full h-full
+        bg-black/90 backdrop-blur-md
+        flex flex-col items-center justify-center
+        transition-all duration-500 ease-in-out
+        `;
+        game.dataset.maximized = "true";
+        fallback.classList.add("translate-y-[-200px]");
+        normalizeGameBtn.classList.remove("hidden");
+        maximizeGameBtn.classList.add("hidden");
+      } else {
+        console.log("max");
+        // Restaurar clases originales
+        game.className = game.dataset.originalClass || "";
+        game.dataset.maximized = "false";
+        fallback.classList.remove("translate-y-[-200px]");
+        normalizeGameBtn.classList.add("hidden");
+        maximizeGameBtn.classList.remove("hidden");
+      }
+    }
+
+    normalizeGameBtn.addEventListener("click", toggleScreenButton);
+    maximizeGameBtn.addEventListener("click", toggleScreenButton);
+
+    minimizeGameBtn.addEventListener("click", () => {
+      game = document.getElementById("game-section");
+      // Espera al cierre real del <game> usando el evento nativo `toggle`
+      const onToggle = () => {
+        if (!game?.open) {
+          fallback.classList.remove("translate-y-[-200px]");
+          setTimeout(() => {
+            // Fallback opcional
+            fallback?.scrollIntoView({ behavior: "smooth", block: "center" });
+            game.className = game.dataset.originalClass || "";
+            game.dataset.maximized = "false";
+          }, 400);
+        }
+
+        game.removeEventListener("toggle", onToggle);
+      };
+
+      game.addEventListener("toggle", onToggle);
+
+      // Cierra el <game>
+      game.open = false;
+
+      // Por si el navegador no anima el cierre, espera al próximo frame antes del scroll
+      // requestAnimationFrame(() => requestAnimationFrame(() => {
+      //   anchor.scrollIntoView({ behavior: "smooth", block: "start" });
+      // }));
+    });
+
+    expandGameBtn.addEventListener("click", () => {
+      game = document.getElementById("game-section");
+      // Espera al cierre real del <game> usando el evento nativo `toggle`
+      const onToggle = () => {
+        console.log(game);
+
+        if (game?.open) {
+          console.log("porque aca 2");
+
+          setTimeout(() => {
+            // Fallback opcional
+            game?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 100);
+        }
+
+        game.removeEventListener("toggle", onToggle);
+      };
+
+      game.addEventListener("toggle", onToggle);
+
+      // Cierra el <game>
+      game.open = false;
+
+      // Por si el navegador no anima el cierre, espera al próximo frame antes del scroll
+      // requestAnimationFrame(() => requestAnimationFrame(() => {
+      //   anchor.scrollIntoView({ behavior: "smooth", block: "start" });
+      // }));
+    });
+  });
+</script>

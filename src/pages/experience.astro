@@ -1,0 +1,37 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ExperienceTimline from "../components/ExperienceTimline.astro";
+
+// src/components/TimelineSection.astro
+
+const experiences = [
+  {
+    period: "2022 – Presente",
+    role: "Full Stack Web Developer @ FUSIONAR",
+    details:
+      "Lidero desarrollo y mantenimiento de aplicaciones escalables usando React.js, Laravel y APIs REST. Implementación backend con Node.js y Flask; despliegue en Apache, Nginx e IIS.",
+  },
+  {
+    period: "2018 – 2021",
+    role: "IT Support Manager @ CENAFOSalud",
+    details:
+      "Soporte técnico interno, diseño web corporativa y soluciones software internas para optimizar flujos de trabajo.",
+  },
+  {
+    period: "2019 – 2023",
+    role: "Técnico en Automatización Industrial @ UTU",
+    details:
+      "Formación técnica en automatización, combinando teoría y la práctica en automatización industrial.",
+  },
+  {
+    period: "2021 – 2022",
+    role: "Full stack Web Developer @ JaP Plan Ceibal",
+    details:
+      "Formación especializada como desarrollador Full Stack en entorno educativo.",
+  },
+];
+---
+
+<Layout title="My experience">
+  <ExperienceTimline />
+</Layout>

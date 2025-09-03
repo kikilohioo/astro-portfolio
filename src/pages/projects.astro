@@ -1,0 +1,19 @@
+---
+import "../styles/global.css";
+import Layout from "../layouts/Layout.astro";
+import ProjectCard from "../components/cards/ProjectCard.astro";
+import { getCollection } from "astro:content";
+import ProjectsCarrousel from "../components/ProjectsCarrousel.astro";
+import Terminal from "../components/Terminal.astro";
+
+const projects = await getCollection("projects");
+
+export const prerender = true;
+---
+
+<Layout>
+  <main class="min-h-screen flex flex-col items-center justify-center px-6 py-16 bg-gradient-to-br from-teal-400 to-teal-700 text-white">
+    <Terminal minimized={true} />
+    <ProjectsCarrousel projects={projects} />
+  </main>
+</Layout>

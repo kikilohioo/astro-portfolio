@@ -1,0 +1,45 @@
+---
+// ProfileCard.astro
+const { image, name, position, description, ctaText, ctaLink } = Astro.props;
+---
+
+<div
+  id="profile-card"
+  class="max-w-sm mx-auto bg-gradient-to-t from-[#d5e8d5] to-transparent rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
+>
+  <!-- Foto -->
+  <img
+    class="mx-auto -mt-35 -mb-25 h-100 object-cover mask-bottom"
+    src={image}
+    alt={`Foto de ${name}`}
+  />
+
+  <!-- Contenido -->
+  <div class="p-6 text-start flex flex-col">
+    <h2 class="text-2xl font-bold text-gray-800">{name}</h2>
+    <p class="text-teal-700 font-medium mt-1">{position}</p>
+    <p class="text-gray-600 mt-4 prose">{description}</p>
+
+    <!-- Call to action -->
+    <a
+      id="cta-button-profile"
+      href={ctaLink}
+      class="inline-block mt-6 px-10 mx-15 py-3 bg-teal-500 text-white text-center font-semibold rounded-lg hover:bg-teal-600 transition-colors duration-300"
+    >
+      {ctaText}
+    </a>
+  </div>
+</div>
+<style>
+  #profile-card {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 10px;
+    top: 17pc;
+    right: 150px;
+    float: inline-end;
+    z-index: 49;
+    position: absolute; /* antes absolute */
+  }
+</style>

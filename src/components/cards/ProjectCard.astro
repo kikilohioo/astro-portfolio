@@ -1,0 +1,72 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  title: string;
+  description: string;
+  image: string;
+  detailsLink?: string;
+  demoLink?: string;
+  slug?: string;
+  color?: string | undefined;
+}
+
+const colorMap: Record<string, string> = {
+  "teal-200": "bg-teal-200",
+  "teal-300": "bg-teal-300",
+  "teal-400": "bg-teal-400",
+  "teal-100": "bg-teal-100",
+  white: "bg-white",
+};
+
+const {
+  title,
+  description,
+  image,
+  detailsLink = "#",
+  slug,
+  color,
+} = Astro.props as Props;
+
+const fomratedColor = `${colorMap[color ?? "teal-300"]}`;
+const cardClasses = `${fomratedColor} min-w-[500px] w-[500px] p-0 m-0 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 proyect-card rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300`;
+
+export const prerender = true;
+---
+
+<div
+  class={cardClasses}
+>
+  <img
+    transition:name={`image-${slug}`}
+    src={image}
+    alt={`Captura ${title}`}
+    class="w-full h-48 object-cover object-top"
+  />
+  <div class="p-4">
+    <h2 class="text-xl font-semibold mb-2" transition:name={`h3-title-${slug}`}>
+      {title}
+    </h2>
+    <p class="text-gray-600 mb-4">
+      {description}
+    </p>
+    <div class="flex justify-between items-center">
+      <a
+        href={detailsLink}
+        class="proyect-card-details-button bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+      >
+        <div class="flex items-center gap-1">
+          <span>See more </span><Icon name="plus" size={20} class="ms-3" />
+        </div>
+      </a>
+      <a
+        href={`/projects/${slug}/demo`}
+        class="proyect-card-demo-button bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+      >
+        <div class="flex items-center gap-1">
+          <span>Test demo </span><Icon name="link" size={20} class="ms-3" />
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

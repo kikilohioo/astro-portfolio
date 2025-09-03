@@ -1,0 +1,275 @@
+---
+import { Icon } from "astro-icon/components";
+
+const { commands = {}, minimized = false } = Astro.props;
+
+const terminalMinimized = "terminal-minimized";
+const terminalMaximized = "terminal-normal";
+
+const initialClass = minimized ? terminalMinimized : terminalMaximized;
+
+const initialHeight = minimized ? "h-32" : "h-82";
+
+const currentPath = Astro.url.pathname; 
+---
+
+<div id="terminal" class={initialClass} transition:name="terminal">
+  <div
+    id="console-output"
+    class={`${initialHeight} overflow-y-auto whitespace-pre-wrap text-sm text-green-400 font-mono`}
+  >
+  </div>
+
+  <div class="flex items-center mt-2">
+    <span class="text-green-500 mr-2" id="console-prompt">/home $</span>
+    <input
+      id="console-input"
+      type="text"
+      class="flex-1 bg-transparent outline-none text-green-400 placeholder-green-700 font-mono"
+      placeholder="Escribe un comando..."
+    />
+  </div>
+  <button
+    id="toggle-terminal"
+    class={`absolute bottom-4 right-1 bg-transparent cursor-pointer text-white font-bold py-2 px-4 rounded shadow-lg
+         transition-transform duration-200 hover:scale-110 ${minimized ? "hidden" : ""}`}
+    type="button"
+  >
+    <Icon name="minimize_terminal" class="icon-minimize" size={25} />
+    <Icon name="maximize_terminal" class="icon-maximize hidden" size={25} />
+  </button>
+</div>
+
+<script is:inline>
+  const output = document.getElementById("console-output");
+  const prompt = document.getElementById("console-prompt");
+
+  // 🔹 Guardar la ruta actual
+  function setCurrentDir(path) {
+    localStorage.setItem("currentDir", path);
+  }
+
+  // 🔹 Obtener la ruta actual
+  function getCurrentDir() {
+    return localStorage.getItem("currentDir") || "/home"; // valor por defecto
+  }
+
+  // 🔹 Agregar una ruta al historial
+  function addDirToHistory(path) {
+    let history = JSON.parse(localStorage.getItem("dirHistory")) || [];
+    history.push(path); // agregamos la nueva ruta
+    localStorage.setItem("dirHistory", JSON.stringify(history));
+  }
+
+  // 🔹 Obtener todo el historial de rutas
+  function getDirHistory() {
+    return JSON.parse(localStorage.getItem("dirHistory")) || ["/home"];
+  }
+
+  // 🔹 Obtener la última ruta antes de la actual
+  function getLastDir() {
+    const history = JSON.parse(localStorage.getItem("dirHistory")) || [];
+    return history.length > 1 ? history[history.length - 2] : "/home";
+  }
+
+  // 🔹 Resetear historial (opcional)
+  function clearDirHistory() {
+    localStorage.removeItem("dirHistory");
+  }
+  
+  setCurrentDir(getCurrentDir());
+  addDirToHistory(getCurrentDir());
+
+  const routes = {
+    "/home": ["projects", "experience", "contact", "links"],
+    "/projects": [],
+    "/experience": [],
+    "/..": [],
+    "/contact": [],
+    "/links": ["github", "linkedin", "portfolio"],
+  };
+
+  const links = {
+    github: "https://github.com/tu-usuario",
+    linkedin: "https://linkedin.com/in/tu-usuario",
+    portfolio: "https://tu-portfolio.com",
+  };
+
+  let currentDir = "/home";
+
+  function print(text) {
+    output.innerHTML += text + "\n";
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function updatePrompt() {
+    prompt.textContent = currentDir + " $";
+  }
+
+  function runCommand(inputCommand) {
+    const args = inputCommand.trim().split(/\s+/);
+    const cmd = args[0];
+    const param = args[1];
+
+    switch (cmd) {
+      case "help":
+        print("Comandos disponibles: help, ls, cd, open, clear, pwd");
+        break;
+
+      case "ls":
+        let target = param
+          ? param.startsWith("/")
+            ? param.toLowerCase()
+            : "/" + param.toLowerCase()
+          : currentDir;
+        if (routes[target]) {
+          if (routes[target].length === 0) {
+            print("(vacío)");
+          } else {
+            print(routes[target].join("\n"));
+          }
+        } else {
+          print("Directorio no encontrado: " + param);
+        }
+        break;
+
+      case "cd":
+        if (!param) {
+          print("Uso: cd <ruta>");
+        } else {
+          const path = param.startsWith("/")
+            ? param.toLowerCase()
+            : "/" + param.toLowerCase();
+          if (routes[path]) {
+            currentDir = path;
+            print("Movido a " + currentDir);
+            if (path !== "/links") {
+              // Redirigir a ruta si no es /links
+              window.location.href = path === "/home" ? "/" : path;
+            }
+            if( path === "/..") {
+              window.location.href = getLastDir() === "/home" ? "/" : getLastDir();
+            }
+          } else {
+            print("Ruta no encontrada: " + path);
+          }
+        }
+        break;
+
+      case "open":
+        if (currentDir !== "/links") {
+          print("Debes estar en /links para abrir enlaces.");
+        } else if (!param) {
+          print("Uso: open <nombre_link>");
+        } else {
+          const link = links[param.toLowerCase()];
+          if (link) {
+            print("Abriendo " + param + "...");
+            window.open(link, "_blank");
+          } else {
+            print("Link no encontrado: " + param);
+          }
+        }
+        break;
+
+      case "pwd":
+        print(currentDir);
+        break;
+
+      case "clear":
+        output.innerHTML = "";
+        break;
+
+      default:
+        print("Comando no reconocido: " + cmd);
+    }
+  }
+
+  document.addEventListener("keydown", (e) => {
+    const input = document.getElementById("console-input");
+    if (!input) return;
+    if (e.target !== input) return; // asegurarnos de que el evento viene del input
+
+    if (e.key === "Enter") {
+      const prompt = document.getElementById("console-prompt");
+      const output = document.getElementById("console-output");
+
+      const command = input.value.trim();
+      if (!command) return;
+
+      output.innerHTML += prompt.textContent + " " + command + "\n";
+      runCommand(command);
+      input.value = "";
+      prompt.textContent = "/home $";
+      output.scrollTop = output.scrollHeight;
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("#toggle-terminal");
+    if (!btn) return;
+
+    const terminal = document.getElementById("terminal");
+    const output = document.getElementById("console-output");
+
+    if (!terminal || !output) return;
+
+    if (terminal.classList.contains("terminal-normal")) {
+      terminal.classList.remove("terminal-normal");
+      terminal.classList.add("terminal-minimized");
+      output.classList.remove("h-82");
+      output.classList.add("h-32");
+    } else {
+      terminal.classList.remove("terminal-minimized");
+      terminal.classList.add("terminal-normal");
+      output.classList.add("h-82");
+      output.classList.remove("h-32");
+    }
+
+    btn.querySelector(".icon-minimize").classList.toggle("hidden");
+    btn.querySelector(".icon-maximize").classList.toggle("hidden");
+  });
+</script>
+
+<style>
+  /* Estilo cuando se minimiza */
+  .terminal-minimized {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    opacity: 0.7;
+    width: 100%; /* w-full */
+    max-width: 35rem; /* max-w-2xl ≈ 672px */
+    height: 12rem; /* h-100 ≈ 400px (ajustable según tu diseño) */
+    background-color: #000; /* bg-black */
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3); /* shadow-lg */
+    padding: 1rem; /* p-4 */
+    margin-left: auto; /* mx-auto para centrar horizontal */
+    margin-right: auto;
+    color: #00ff00; /* opcional: texto verde como terminal */
+    overflow: hidden; /* opcional: para scroll interno */
+    transition: all 0.1s ease; /* para animaciones smooth al minimizar */
+    z-index: 10;
+  }
+  .terminal-normal {
+    position: absolute; /* absolute */
+    top: 50%; /* top-50 */
+    left: 8%; /* left-30 */
+    width: 100%; /* w-full */
+    opacity: 0.85;
+    max-width: 42rem; /* max-w-2xl ≈ 672px */
+    height: 25rem; /* h-100 ≈ 400px (ajustable según tu diseño) */
+    background-color: #000; /* bg-black */
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3); /* shadow-lg */
+    padding: 1rem; /* p-4 */
+    margin-left: auto; /* mx-auto para centrar horizontal */
+    margin-right: auto;
+    transform: translateY(-50%); /* centrar vertical usando top 50% */
+    color: #00ff00; /* opcional: texto verde como terminal */
+    overflow: hidden; /* opcional: para scroll interno */
+    transition: all 0.1s ease; /* para animaciones smooth al minimizar */
+    z-index: 10;
+  }
+</style>

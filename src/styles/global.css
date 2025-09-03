@@ -1,0 +1,27 @@
+@import "tailwindcss";
+@plugin '@tailwindcss/typography';
+@plugin 'tailwind-scrollbar-hide';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .proyect-card-details-button {
+    @apply bg-[#11c18f] text-white px-4 py-2 rounded border-4 border-[#11c18f] transition transform duration-300 hover:scale-105 hover:font-bold hover:border-[#11c18f] hover:bg-transparent;
+  }
+
+  .proyect-card-demo-button {
+    @apply bg-[#e8685f] text-white px-4 py-2 rounded border-4 border-[#e8685f] transition transform duration-300 hover:scale-105 hover:border-[#e8685f] hover:font-bold hover:bg-transparent;
+  }
+
+  .mask-bottom {
+    -webkit-mask-image: linear-gradient(to top, transparent 20%, black 50%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+
+    mask-image: linear-gradient(to top, transparent 20%, black 50%);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+  }
+}

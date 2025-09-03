@@ -1,0 +1,160 @@
+<div class="fixed inset-0 -z-10 bg-cover bg-center">
+  <div id="three-canvas" class="fixed -z-11 w-full h-full"></div>
+  <div
+    class="blur-overlay fixed inset-0 -z-10 backdrop-blur-xs bg-white/5 pointer-events-none"
+  >
+  </div>
+</div>
+<script>
+  import * as THREE from "three";
+  import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+  function initThree() {
+    // === Escena, cámara y renderer ===
+    const scene: THREE.Scene = new THREE.Scene();
+    const camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera(
+      60,
+      window.innerWidth / window.innerHeight,
+      1,
+      1000
+    );
+    camera.position.set(0, 20, 10);
+    camera.lookAt(0, 0, 0);
+
+    const renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer({
+      alpha: true,
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const canvas = document.getElementById("three-canvas");
+    if (canvas) {
+      canvas.appendChild(renderer.domElement);
+    }
+
+    // Luz direccional (como el sol)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(10, 20, 10);
+    scene.add(directionalLight);
+
+    // Luz ambiental para suavizar sombras y colores
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    // === Geometrías de las figuras ===
+    const cube = new THREE.Mesh(
+      new THREE.BoxGeometry(6, 6, 6),
+      new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true })
+    );
+    scene.add(cube);
+
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(3, 32, 32),
+      new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+    );
+    scene.add(sphere);
+
+    const cone = new THREE.Mesh(
+      new THREE.ConeGeometry(4, 8, 32),
+      new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true })
+    );
+    scene.add(cone);
+
+    const dodecahedron: THREE.Mesh = new THREE.Mesh(
+      new THREE.DodecahedronGeometry(7),
+      new THREE.MeshBasicMaterial({ color: 0xd5f7d5, wireframe: true })
+    );
+    scene.add(dodecahedron);
+
+    // === Modelo Blender (centro del sistema solar) ===
+    let centralModel: THREE.Object3D | null = null;
+    const loader: GLTFLoader = new GLTFLoader();
+
+    loader.load(
+      "/models/hacker_laptop.glb", // ruta a tu archivo
+      (gltf) => {
+        centralModel = gltf.scene;
+        centralModel.scale.set(0.0035, 0.0035, 0.0035);
+        centralModel.position.set(0, 0, 0);
+        scene.add(centralModel);
+      },
+      undefined,
+      (error) => {
+        console.error("Error cargando el modelo:", error);
+      }
+    );
+
+    // === Función para crear órbitas ===
+    function createOrbit(radius: number): THREE.Line {
+      const curve = new THREE.EllipseCurve(
+        0,
+        0,
+        radius,
+        radius,
+        0,
+        2 * Math.PI
+      );
+      const points = curve.getPoints(100);
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const material = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        opacity: 0.5,
+        transparent: true,
+      });
+      const orbit = new THREE.LineLoop(geometry, material);
+      orbit.rotation.x = Math.PI / 2;
+      return orbit;
+    }
+
+    // Agregar órbitas
+    scene.add(createOrbit(10));
+    scene.add(createOrbit(15));
+    scene.add(createOrbit(20));
+    scene.add(createOrbit(25));
+
+    scene.position.x -= 5;
+    // === Animación orbital ===
+    function animate(): void {
+      const time: number = Date.now() * 0.001;
+
+      // órbitas
+      cube.position.x = Math.cos(time) * 10;
+      cube.position.z = Math.sin(time) * 10;
+
+      sphere.position.x = Math.cos(time * 0.5) * 15;
+      sphere.position.z = Math.sin(time * 0.5) * 15;
+
+      cone.position.x = Math.cos(time * 1.5) * 20;
+      cone.position.z = Math.sin(time * 1.5) * 20;
+
+      dodecahedron.position.x = Math.cos(time * 0.8) * 25;
+      dodecahedron.position.z = Math.sin(time * 0.8) * 25;
+
+      // rotaciones propias
+      cube.rotation.y += 0.01;
+      sphere.rotation.y += 0.01;
+      cone.rotation.y += 0.01;
+      dodecahedron.rotation.y += 0.01;
+
+      // modelo central girando
+      if (centralModel) {
+        centralModel.rotation.y += 0.005;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    renderer.setAnimationLoop(animate);
+
+    // === Ajuste al redimensionar ===
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  }
+
+  // Primera carga y navegación
+  document.addEventListener("DOMContentLoaded", initThree);
+  document.addEventListener("astro:navigation-end", initThree);
+</script>

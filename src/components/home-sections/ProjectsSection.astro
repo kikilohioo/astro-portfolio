@@ -1,0 +1,382 @@
+---
+import ProjectsCarrousel from "../../components/ProjectsCarrousel.astro";
+import { Icon } from "astro-icon/components";
+import type { Project } from "../../interfaces/Project";
+import { getCollection } from "astro:content";
+
+let projects = (await getCollection("projects")) as Project[];
+
+projects = projects.filter((project, index) => {
+  if (project.slug == "no-mas-puchos") return true;
+  if (project.slug == "farmsim") return true;
+  return false;
+});
+---
+
+<section
+  id="projects-section"
+  class="section projects-section h-screen mt-[105vh] flex flex-col items-center justify-between px-30 py-25 backdrop-blur-sm bg-transparent transition-colors duration-1000 ease-in-out"
+  data-color="#ffffff"
+  data-header-color="#f54242"
+>
+  <!-- SVG BACK PATTERN -->
+  <div
+    id="background-pattern"
+    class="absolute inset-0 -z-10 opacity-0 transition-opacity duration-1500 ease-in-out overflow-hidden"
+  >
+    <!-- tu SVG aquí -->
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 1080 900"
+      preserveAspectRatio="none"
+    >
+      <defs>
+        <linearGradient
+          id="a"
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          x2="0"
+          y1="0"
+          y2="100%"
+          gradientTransform="rotate(240)"
+        >
+          <stop offset="0" stop-color="#ffffff"></stop>
+          <stop offset="1" stop-color="#4FE"></stop>
+        </linearGradient>
+        <pattern
+          id="b"
+          patternUnits="userSpaceOnUse"
+          width="540"
+          height="450"
+          x="0"
+          y="0"
+          viewBox="0 0 1080 900"
+        >
+          <g fill-opacity="0.1">
+            <polygon fill="#444" points="90 150 0 300 180 300"></polygon>
+            <polygon points="90 150 180 0 0 0"></polygon>
+            <polygon fill="#AAA" points="270 150 360 0 180 0"></polygon>
+            <polygon fill="#DDD" points="450 150 360 300 540 300"></polygon>
+            <polygon fill="#999" points="450 150 540 0 360 0"></polygon>
+            <polygon points="630 150 540 300 720 300"></polygon>
+            <polygon fill="#DDD" points="630 150 720 0 540 0"></polygon>
+            <polygon fill="#444" points="810 150 720 300 900 300"></polygon>
+            <polygon fill="#FFF" points="810 150 900 0 720 0"></polygon>
+            <polygon fill="#DDD" points="990 150 900 300 1080 300"></polygon>
+            <polygon fill="#444" points="990 150 1080 0 900 0"></polygon>
+            <polygon fill="#DDD" points="90 450 0 600 180 600"></polygon>
+            <polygon points="90 450 180 300 0 300"></polygon>
+            <polygon fill="#666" points="270 450 180 600 360 600"></polygon>
+            <polygon fill="#AAA" points="270 450 360 300 180 300"></polygon>
+            <polygon fill="#DDD" points="450 450 360 600 540 600"></polygon>
+            <polygon fill="#999" points="450 450 540 300 360 300"></polygon>
+            <polygon fill="#999" points="630 450 540 600 720 600"></polygon>
+            <polygon fill="#FFF" points="630 450 720 300 540 300"></polygon>
+            <polygon points="810 450 720 600 900 600"></polygon>
+            <polygon fill="#DDD" points="810 450 900 300 720 300"></polygon>
+            <polygon fill="#AAA" points="990 450 900 600 1080 600"></polygon>
+            <polygon fill="#444" points="990 450 1080 300 900 300"></polygon>
+            <polygon fill="#222" points="90 750 0 900 180 900"></polygon>
+            <polygon points="270 750 180 900 360 900"></polygon>
+            <polygon fill="#DDD" points="270 750 360 600 180 600"></polygon>
+            <polygon points="450 750 540 600 360 600"></polygon>
+            <polygon points="630 750 540 900 720 900"></polygon>
+            <polygon fill="#444" points="630 750 720 600 540 600"></polygon>
+            <polygon fill="#AAA" points="810 750 720 900 900 900"></polygon>
+            <polygon fill="#666" points="810 750 900 600 720 600"></polygon>
+            <polygon fill="#999" points="990 750 900 900 1080 900"></polygon>
+            <polygon fill="#999" points="180 0 90 150 270 150"></polygon>
+            <polygon fill="#444" points="360 0 270 150 450 150"></polygon>
+            <polygon fill="#FFF" points="540 0 450 150 630 150"></polygon>
+            <polygon points="900 0 810 150 990 150"></polygon>
+            <polygon fill="#222" points="0 300 -90 450 90 450"></polygon>
+            <polygon fill="#FFF" points="0 300 90 150 -90 150"></polygon>
+            <polygon fill="#FFF" points="180 300 90 450 270 450"></polygon>
+            <polygon fill="#666" points="180 300 270 150 90 150"></polygon>
+            <polygon fill="#222" points="360 300 270 450 450 450"></polygon>
+            <polygon fill="#FFF" points="360 300 450 150 270 150"></polygon>
+            <polygon fill="#444" points="540 300 450 450 630 450"></polygon>
+            <polygon fill="#222" points="540 300 630 150 450 150"></polygon>
+            <polygon fill="#AAA" points="720 300 630 450 810 450"></polygon>
+            <polygon fill="#666" points="720 300 810 150 630 150"></polygon>
+            <polygon fill="#FFF" points="900 300 810 450 990 450"></polygon>
+            <polygon fill="#999" points="900 300 990 150 810 150"></polygon>
+            <polygon points="0 600 -90 750 90 750"></polygon>
+            <polygon fill="#666" points="0 600 90 450 -90 450"></polygon>
+            <polygon fill="#AAA" points="180 600 90 750 270 750"></polygon>
+            <polygon fill="#444" points="180 600 270 450 90 450"></polygon>
+            <polygon fill="#444" points="360 600 270 750 450 750"></polygon>
+            <polygon fill="#999" points="360 600 450 450 270 450"></polygon>
+            <polygon fill="#666" points="540 600 630 450 450 450"></polygon>
+            <polygon fill="#222" points="720 600 630 750 810 750"></polygon>
+            <polygon fill="#FFF" points="900 600 810 750 990 750"></polygon>
+            <polygon fill="#222" points="900 600 990 450 810 450"></polygon>
+            <polygon fill="#DDD" points="0 900 90 750 -90 750"></polygon>
+            <polygon fill="#444" points="180 900 270 750 90 750"></polygon>
+            <polygon fill="#FFF" points="360 900 450 750 270 750"></polygon>
+            <polygon fill="#AAA" points="540 900 630 750 450 750"></polygon>
+            <polygon fill="#FFF" points="720 900 810 750 630 750"></polygon>
+            <polygon fill="#222" points="900 900 990 750 810 750"></polygon>
+            <polygon fill="#222" points="1080 300 990 450 1170 450"></polygon>
+            <polygon fill="#FFF" points="1080 300 1170 150 990 150"></polygon>
+            <polygon points="1080 600 990 750 1170 750"></polygon>
+            <polygon fill="#666" points="1080 600 1170 450 990 450"></polygon>
+            <polygon fill="#DDD" points="1080 900 1170 750 990 750"></polygon>
+          </g>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" fill="url(#a)" width="100%" height="100%"></rect>
+      <rect x="0" y="0" fill="url(#b)" width="100%" height="100%"></rect>
+    </svg>
+  </div>
+  <!-- SVG WAVE BORDER -->
+  <div
+    id="wave-svg"
+    class="absolute -top-10 left-0 w-full overflow-hidden leading-[0] opacity-0 transition-opacity duration-400 ease-in-out"
+  >
+    <svg class="w-full h-20" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path
+        fill="#ffffff"
+        d="M0,64L48,85.3C96,107,192,149,288,149.3C384,149,480,107,576,80C672,53,768,43,864,48C960,53,1056,75,1152,90.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+      ></path>
+    </svg>
+  </div>
+  <!-- Título -->
+  <h1 class="text-4xl font-bold text-teal-500 mb-8 self-start">Projects</h1>
+
+  <!-- Carrusel de proyectos -->
+  <div class="flex-1 w-full flex items-center justify-center">
+    <ProjectsCarrousel projects={projects} color="teal-100" />
+  </div>
+
+  <!-- Link "See more" -->
+  <a
+    id="cta-button-projects"
+    href="/projects"
+    class="flex items-center gap-2 text-white mt-8 hover:text-pink-300 transition"
+  >
+    <span class="text-xl text-teal-600 font-bold">See more projects</span>
+    <Icon name="right-arrow-teal-500" size={25} class="mt-1" />
+  </a>
+</section>
+
+<style>
+  .projects-section {
+    position: relative;
+    z-index: 0;
+  }
+
+  @property --myColor1 {
+    syntax: "<color>";
+    initial-value: "white";
+    inherits: false;
+  }
+
+  @property --myColor2 {
+    syntax: "<color>";
+    initial-value: "white";
+    inherits: false;
+  }
+
+  .projects-section::before {
+    content: "";
+    position: absolute;
+    background: linear-gradient(
+      to bottom,
+      #ffffff 70%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    /* background: linear-gradient(to bottom, var(--myColor1) 80%, var(--myColor2) 20%); */
+    transition:
+      --myColor1 1s,
+      --myColor2 1s;
+    pointer-events: none; /* para que no bloquee clicks */
+    opacity: 0;
+    background-size: cover;
+    inset: 0;
+    z-index: -1;
+    --myColor1: #ffffff;
+    --myColor2: rgba(255, 255, 255, 0);
+  }
+  .projects-section.active::before {
+    opacity: 1; /* aquí “aparece” el degradado */
+  }
+</style>
+<script>
+  const setInterseptors = () => {
+    const sections = [
+      ...document.querySelectorAll<HTMLElement>(".section[data-color]"),
+    ];
+
+    const menuItemsText = [
+      ...document.querySelectorAll<HTMLElement>(".menu-text-item"),
+    ];
+
+    const profileCardButton = document.querySelector<HTMLElement>(
+      "#cta-button-profile"
+    );
+
+    const ctaButtonProjects = document.querySelector<HTMLElement>(
+      "#cta-button-projects"
+    );
+    const resetBtnGame = document.querySelector<HTMLElement>(
+      "#restart-game-button"
+    );
+    const skills = document.querySelector<HTMLElement>(
+      "#skills"
+    );
+
+    const options = {
+      threshold: 0.9,
+    };
+
+    const skillsOptions = {
+      threshold: 0,
+    };
+
+    const handleIntersectSection: IntersectionObserverCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const headerColor = entry.target.getAttribute("data-header-color");
+          const color = entry.target.getAttribute("data-color");
+
+          const target = entry.target as HTMLElement;
+
+          const headerLogo = document.querySelector<HTMLElement>("#title-link");
+          const wave = document.querySelector<HTMLElement>("#wave-svg");
+          const backPattern = document.querySelector<HTMLElement>(
+            "#background-pattern"
+          );
+          if (entry.isIntersecting) {
+            target.style.backgroundColor = color || "white";
+            target.classList.add("active");
+            if (wave) wave.style.opacity = "1";
+            if (backPattern) backPattern.style.opacity = "1";
+            if (headerLogo) {
+              headerLogo.style.color = headerColor || "black";
+
+              menuItemsText.forEach((item) => {
+                item.style.color = headerColor || "black";
+              });
+            }
+          } else {
+            menuItemsText.forEach((item) => {
+              item.style.color = headerColor || "black";
+            });
+          }
+        }
+      });
+    };
+
+    const handleIntersectMainSection: IntersectionObserverCallback = (
+      entries
+    ) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const headerColor = "#46ecd5";
+
+          const headerLogo = document.querySelector<HTMLElement>("#title-link");
+          if (entry.isIntersecting) {
+            if (headerLogo) {
+              headerLogo.style.color = headerColor || "black";
+              menuItemsText.forEach((item) => {
+                item.style.color = headerColor || "black";
+              });
+            }
+          }
+        }
+      });
+    };
+
+    const handleIntersectCtaMoreProjects: IntersectionObserverCallback = (
+      entries
+    ) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const headerColor = "#f54242";
+
+          const headerLogo = document.querySelector<HTMLElement>("#title-link");
+          if (entry.isIntersecting) {
+            if (headerLogo) {
+              headerLogo.style.color = headerColor || "black";
+              menuItemsText.forEach((item) => {
+                item.style.color = headerColor || "black";
+              });
+            }
+          }
+        }
+      });
+    };
+
+    const handleIntersectResetGameBtn: IntersectionObserverCallback = (
+      entries
+    ) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const headerColor = "#46ecd5";
+
+          const headerLogo = document.querySelector<HTMLElement>("#title-link");
+          if (entry.isIntersecting) {
+            if (headerLogo) {
+              headerLogo.style.color = headerColor || "black";
+              menuItemsText.forEach((item) => {
+                item.style.color = headerColor || "black";
+              });
+            }
+          }
+        }
+      });
+    };
+
+    const handleIntersectSkills: IntersectionObserverCallback = (
+      entries
+    ) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const headerColor = "#f54242";
+
+          const headerLogo = document.querySelector<HTMLElement>("#title-link");
+          if (entry.isIntersecting) {
+            if (headerLogo) {
+              headerLogo.style.color = headerColor || "black";
+              menuItemsText.forEach((item) => {
+                item.style.color = headerColor || "black";
+              });
+            }
+          }
+        }
+      });
+    };
+
+    const sectionObserver = new IntersectionObserver(
+      handleIntersectSection,
+      options
+    );
+    const headerObserver = new IntersectionObserver(
+      handleIntersectMainSection,
+      options
+    );
+    const ctaMoreProjectsObserver = new IntersectionObserver(
+      handleIntersectCtaMoreProjects,
+      options
+    );
+    const resetBtnGameObserver = new IntersectionObserver(
+      handleIntersectResetGameBtn,
+      options
+    );
+    const skillsObserver = new IntersectionObserver(
+      handleIntersectSkills,
+      skillsOptions
+    );
+
+    sections.forEach((section) => sectionObserver.observe(section));
+    headerObserver.observe(profileCardButton as Element);
+    ctaMoreProjectsObserver.observe(ctaButtonProjects as Element);
+    resetBtnGameObserver.observe(resetBtnGame as Element);
+    skillsObserver.observe(skills as Element);
+  };
+
+  window.addEventListener("DOMContentLoaded", () => {
+    setInterseptors();
+  });
+</script>

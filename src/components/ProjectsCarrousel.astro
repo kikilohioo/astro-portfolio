@@ -1,0 +1,46 @@
+---
+import type { Project } from "../interfaces/Project";
+import ProjectCard from "./cards/ProjectCard.astro";
+
+interface ProjectsCarrouselProps {
+  projects: Project[];
+  color?: string | undefined;
+}
+
+const { projects, color } = Astro.props as ProjectsCarrouselProps 
+
+export const prerender = true;
+---
+
+<div
+  class="flex flex-wrap gap-4 p-4 items-center justify-center scrollbar-hide overflow-x-auto"
+>
+  {
+    projects.map(
+      (project: {
+        data: {
+          title: string;
+          description: string;
+          image: string;
+          demo: string | undefined;
+        };
+        slug: any;
+      }) => {
+        const { title, description, image, demo } = project.data;
+        const { slug } = project;
+
+        return (
+          <ProjectCard
+            title={title}
+            description={description}
+            image={image}
+            detailsLink={`/projects/${slug}`}
+            demoLink={demo ?? "#"}
+            slug={slug}
+            color={color}
+          />
+        );
+      }
+    )
+  }
+</div>
