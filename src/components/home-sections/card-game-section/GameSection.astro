@@ -89,13 +89,9 @@ import { Icon } from "astro-icon/components";
     document.documentElement.style.scrollBehavior = "smooth";
 
     function toggleScreenButton () {
-      console.log("ejecutando");
-      
       const isMaximized = game.dataset.maximized === "true";
 
       if (!isMaximized) {
-        console.log("no max");
-
         // Guardar clases originales
         game.dataset.originalClass = game.className;
 
@@ -111,7 +107,6 @@ import { Icon } from "astro-icon/components";
         normalizeGameBtn.classList.remove("hidden");
         maximizeGameBtn.classList.add("hidden");
       } else {
-        console.log("max");
         // Restaurar clases originales
         game.className = game.dataset.originalClass || "";
         game.dataset.maximized = "false";
@@ -156,11 +151,7 @@ import { Icon } from "astro-icon/components";
       game = document.getElementById("game-section");
       // Espera al cierre real del <game> usando el evento nativo `toggle`
       const onToggle = () => {
-        console.log(game);
-
         if (game?.open) {
-          console.log("porque aca 2");
-
           setTimeout(() => {
             // Fallback opcional
             game?.scrollIntoView({ behavior: "smooth", block: "center" });

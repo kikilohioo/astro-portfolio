@@ -1,26 +1,61 @@
 ---
 import { Icon } from "astro-icon/components";
 
-const { commands = {}, minimized = false } = Astro.props;
+const { commands = {}, display = "normal", position = "left" } = Astro.props;
 
-const terminalMinimized = "terminal-minimized";
 const terminalMaximized = "terminal-normal";
+const terminalCollapsed = "terminal-collapsed";
+const terminalMinimized = "terminal-minimized";
 
-const initialClass = minimized ? terminalMinimized : terminalMaximized;
+let initialClass = "";
+let initialHeight = "";
 
-const initialHeight = minimized ? "h-32" : "h-82";
+switch (display) {
+  case "collapsed":
+    initialClass = terminalCollapsed;
+    initialHeight = "h-26";
+    break;
+  case "minimized":
+    initialClass = terminalMinimized;
+    initialHeight = "hidden";
+    break;
+  case "normal":
+  default:
+    initialClass = terminalMaximized;
+    initialHeight = "h-82";
+    break;
+}
 
-const currentPath = Astro.url.pathname; 
+const currentPath = Astro.url.pathname;
 ---
 
-<div id="terminal" class={initialClass} transition:name="terminal">
+<div
+  id="terminal"
+  class={initialClass}
+  transition:name="terminal"
+  data-display={display}
+  data-position={position}
+>
+  <button
+    id="minimize-terminal-btn"
+    class={`${display == "minimized" ? "hidden" : ""} cursor-pointer`}
+  >
+    <Icon name="minimize_terminal_2" />
+  </button>
+  <button
+    id="normalize-terminal-btn"
+    class={`${display == "minimized" ? "" : "hidden"} cursor-pointer text-center flex flex-row gap-2 items-center -mt-1`}
+  >
+    Show terminal
+    <Icon name="maximize_terminal" size={20} />
+  </button>
   <div
     id="console-output"
-    class={`${initialHeight} overflow-y-auto whitespace-pre-wrap text-sm text-green-400 font-mono`}
+    class={`overflow-y-auto whitespace-pre-wrap text-sm text-green-400 font-mono ${initialHeight}`}
   >
   </div>
 
-  <div class="flex items-center mt-2">
+  <div id="terminal-input" class="flex items-center mt-2">
     <span class="text-green-500 mr-2" id="console-prompt">/home $</span>
     <input
       id="console-input"
@@ -32,11 +67,19 @@ const currentPath = Astro.url.pathname;
   <button
     id="toggle-terminal"
     class={`absolute bottom-4 right-1 bg-transparent cursor-pointer text-white font-bold py-2 px-4 rounded shadow-lg
-         transition-transform duration-200 hover:scale-110 ${minimized ? "hidden" : ""}`}
+         transition-transform duration-200 hover:scale-110 ${display == "minimized" ? "hidden" : ""}`}
     type="button"
   >
-    <Icon name="minimize_terminal" class="icon-minimize" size={25} />
-    <Icon name="maximize_terminal" class="icon-maximize hidden" size={25} />
+    <Icon
+      name="minimize_terminal"
+      class={`icon-minimize ${display == "collapsed" || display == "minimized" ? "hidden" : ""}`}
+      size={25}
+    />
+    <Icon
+      name="maximize_terminal"
+      class={`icon-maximize ${display == "normal" || display == "minimized" || display == "" ? "hidden" : ""}`}
+      size={25}
+    />
   </button>
 </div>
 
@@ -76,7 +119,7 @@ const currentPath = Astro.url.pathname;
   function clearDirHistory() {
     localStorage.removeItem("dirHistory");
   }
-  
+
   setCurrentDir(getCurrentDir());
   addDirToHistory(getCurrentDir());
 
@@ -100,10 +143,6 @@ const currentPath = Astro.url.pathname;
   function print(text) {
     output.innerHTML += text + "\n";
     output.scrollTop = output.scrollHeight;
-  }
-
-  function updatePrompt() {
-    prompt.textContent = currentDir + " $";
   }
 
   function runCommand(inputCommand) {
@@ -147,8 +186,9 @@ const currentPath = Astro.url.pathname;
               // Redirigir a ruta si no es /links
               window.location.href = path === "/home" ? "/" : path;
             }
-            if( path === "/..") {
-              window.location.href = getLastDir() === "/home" ? "/" : getLastDir();
+            if (path === "/..") {
+              window.location.href =
+                getLastDir() === "/home" ? "/" : getLastDir();
             }
           } else {
             print("Ruta no encontrada: " + path);
@@ -185,8 +225,8 @@ const currentPath = Astro.url.pathname;
     }
   }
 
+  const input = document.getElementById("console-input");
   document.addEventListener("keydown", (e) => {
-    const input = document.getElementById("console-input");
     if (!input) return;
     if (e.target !== input) return; // asegurarnos de que el evento viene del input
 
@@ -205,38 +245,210 @@ const currentPath = Astro.url.pathname;
     }
   });
 
+  const terminal = document.getElementById("terminal");
   document.addEventListener("click", (e) => {
     const btn = e.target.closest("#toggle-terminal");
     if (!btn) return;
 
+    if (!terminal || !output) return;
+
+    const itemId = "terminal-display";
+    let savedDisplay = localStorage.getItem(itemId);
+
+    if (!savedDisplay) {
+      savedDisplay = "normal";
+      localStorage.setItem(itemId, savedDisplay);
+    }
+
+    switch (savedDisplay) {
+      case "collapsed":
+        setNormalStyle(itemId, terminal, output, btn);
+        break;
+      case "normal":
+      default:
+        setCollapsedStyle(itemId, terminal, output, btn);
+        break;
+    }
+  });
+
+  let btnMin = document.getElementById("minimize-terminal-btn");
+  let btnMax = document.getElementById("normalize-terminal-btn");
+  let toggleTerminal = document.getElementById("toggle-terminal");
+  let terminalInput = document.getElementById("terminal-input");
+
+  const terminalDisplayId = "terminal-display";
+  const terminalPositionId = "terminal-position";
+  const display =
+    localStorage.getItem(terminalDisplayId) ??
+    terminal.dataset.display ??
+    "normal";
+  let position =
+    localStorage.getItem(terminalPositionId) ??
+    terminal.dataset.position ??
+    "left";
+
+  const initialMinStyle = position == "left" ? "left-2" : "right-2";
+  const initialNorStyle = position == "left" ? "left-[8%]" : "right-[8%]";
+  const initialColStyle = position == "left" ? "left-2" : "right-2";
+
+  btnMin.addEventListener("click", (e) => {
+    const output = document.getElementById("console-output");
+
+    if (!terminal || !output) return;
+
+    btnMin.classList.add("hidden");
+    btnMax.classList.remove("hidden");
+    setMinimizedStyle(terminalDisplayId, terminal, output, btnMin);
+  });
+
+  btnMax.addEventListener("click", (e) => {
     const terminal = document.getElementById("terminal");
     const output = document.getElementById("console-output");
 
     if (!terminal || !output) return;
 
-    if (terminal.classList.contains("terminal-normal")) {
-      terminal.classList.remove("terminal-normal");
-      terminal.classList.add("terminal-minimized");
-      output.classList.remove("h-82");
-      output.classList.add("h-32");
-    } else {
-      terminal.classList.remove("terminal-minimized");
-      terminal.classList.add("terminal-normal");
-      output.classList.add("h-82");
-      output.classList.remove("h-32");
-    }
+    btnMin.classList.remove("hidden");
+    btnMax.classList.add("hidden");
 
-    btn.querySelector(".icon-minimize").classList.toggle("hidden");
-    btn.querySelector(".icon-maximize").classList.toggle("hidden");
+    setNormalStyle(terminalDisplayId, terminal, output, btnMax);
+  });
+
+  const setMinimizedStyle = (itemId, terminal, output, btn) => {
+    localStorage.setItem(itemId, "minimized");
+    terminal.classList.remove("terminal-collapsed");
+    terminal.classList.remove("terminal-normal");
+    terminal.classList.add("terminal-minimized");
+
+    terminalInput.classList.add("hidden");
+
+    // set left right position
+    terminal.classList.remove(initialNorStyle);
+    terminal.classList.remove(initialColStyle);
+    terminal.classList.add(initialMinStyle);
+
+    output.classList.add("hidden");
+    output.classList.remove("h-82");
+    output.classList.remove("h-26");
+    toggleTerminal.classList.add("hidden");
+    toggleTerminal.querySelector(".icon-minimize").classList.remove("hidden");
+    toggleTerminal.querySelector(".icon-maximize").classList.add("hidden");
+    if (
+      btn.querySelector(".icon-minimize") ||
+      btn.querySelector(".icon-maximize")
+    ) {
+      btn.querySelector(".icon-minimize").classList.remove("hidden");
+      btn.querySelector(".icon-maximize").classList.add("hidden");
+    }
+  };
+
+  const setNormalStyle = (itemId, terminal, output, btn) => {
+    localStorage.setItem(itemId, "normal");
+    terminal.classList.remove("terminal-collapsed");
+    terminal.classList.remove("terminal-minimized");
+    terminal.classList.add("terminal-normal");
+
+    terminalInput.classList.remove("hidden");
+
+    output.classList.add("h-82");
+    output.classList.remove("h-26");
+
+    // set left right position
+    terminal.classList.remove(initialMinStyle);
+    terminal.classList.add(initialNorStyle);
+    terminal.classList.remove(initialColStyle);
+
+    output.classList.remove("hidden");
+    toggleTerminal.classList.remove("hidden");
+    toggleTerminal.querySelector(".icon-minimize").classList.remove("hidden");
+    toggleTerminal.querySelector(".icon-maximize").classList.add("hidden");
+    if (
+      btn.querySelector(".icon-minimize") ||
+      btn.querySelector(".icon-maximize")
+    ) {
+      btn.querySelector(".icon-minimize").classList.remove("hidden");
+      btn.querySelector(".icon-maximize").classList.add("hidden");
+    }
+  };
+
+  const setCollapsedStyle = (itemId, terminal, output, btn) => {
+    localStorage.setItem(itemId, "collapsed");
+    terminal.classList.remove("terminal-minimized");
+    terminal.classList.remove("terminal-normal");
+    terminal.classList.add("terminal-collapsed");
+
+    terminalInput.classList.remove("hidden");
+
+    output.classList.remove("h-82");
+    output.classList.add("h-26");
+
+    // set left right position
+    terminal.classList.remove(initialMinStyle);
+    terminal.classList.remove(initialNorStyle);
+    terminal.classList.add(initialColStyle);
+
+    output.classList.remove("hidden");
+    btn.querySelector(".icon-minimize").classList.add("hidden");
+    btn.querySelector(".icon-maximize").classList.remove("hidden");
+  };
+
+  const excludedIds = ["name", "email", "message"];
+
+  function isExcluded(el) {
+    return el && excludedIds.includes(el.id);
+  }
+  // 1. Apenas carga la página
+  input.focus();
+
+  // 2. Cuando se hace click en cualquier parte del documento,
+  //    volvemos a darle foco al input (excepto si clickean el botón toggle)
+  document.addEventListener("click", (e) => {
+    const toggleBtn = e.target.closest("#toggle-terminal");
+    const active = document.activeElement;
+    if (toggleBtn) return; // excepción para tu botón
+    if (!isExcluded(active)) {
+      input.focus();
+    }
+  });
+
+  // 3. Si el input pierde el foco por cualquier motivo, lo forzamos de nuevo
+  input.addEventListener("blur", () => {
+    setTimeout(() => {
+      const active = document.activeElement;
+      if (!isExcluded(active)) {
+        input.focus();
+      }
+    }, 0);
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    switch (display) {
+      case "minimized":
+        btnMin.classList.add("hidden");
+        btnMax.classList.remove("hidden");
+
+        setMinimizedStyle(terminalDisplayId, terminal, output, btnMax);
+        break;
+      case "collapsed":
+        btnMin.classList.remove("hidden");
+        btnMax.classList.add("hidden");
+
+        setCollapsedStyle(terminalDisplayId, terminal, output, toggleTerminal);
+        break;
+      case "normal":
+      default:
+        btnMin.classList.remove("hidden");
+        btnMax.classList.add("hidden");
+        setNormalStyle(terminalDisplayId, terminal, output, btnMax);
+        break;
+    }
   });
 </script>
 
 <style>
   /* Estilo cuando se minimiza */
-  .terminal-minimized {
+  .terminal-collapsed {
     position: fixed;
     bottom: 10px;
-    left: 10px;
     opacity: 0.7;
     width: 100%; /* w-full */
     max-width: 35rem; /* max-w-2xl ≈ 672px */
@@ -255,11 +467,29 @@ const currentPath = Astro.url.pathname;
   .terminal-normal {
     position: absolute; /* absolute */
     top: 50%; /* top-50 */
-    left: 8%; /* left-30 */
     width: 100%; /* w-full */
     opacity: 0.85;
     max-width: 42rem; /* max-w-2xl ≈ 672px */
-    height: 25rem; /* h-100 ≈ 400px (ajustable según tu diseño) */
+    height: 26rem; /* h-100 ≈ 400px (ajustable según tu diseño) */
+    background-color: #000; /* bg-black */
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3); /* shadow-lg */
+    padding: 1rem; /* p-4 */
+    margin-left: auto; /* mx-auto para centrar horizontal */
+    margin-right: auto;
+    transform: translateY(-50%); /* centrar vertical usando top 50% */
+    color: #00ff00; /* opcional: texto verde como terminal */
+    overflow: hidden; /* opcional: para scroll interno */
+    transition: all 0.1s ease; /* para animaciones smooth al minimizar */
+    z-index: 10;
+  }
+  .terminal-minimized {
+    position: fixed; /* absolute */
+    bottom: -10px; /* top-50 */
+    width: 100%; /* w-full */
+    opacity: 0.85;
+    max-width: 15rem; /* max-w-2xl ≈ 672px */
+    height: 3rem; /* h-100 ≈ 400px (ajustable según tu diseño) */
     background-color: #000; /* bg-black */
     border-radius: 0.5rem; /* rounded-lg */
     box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3); /* shadow-lg */

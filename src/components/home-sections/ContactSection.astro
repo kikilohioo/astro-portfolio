@@ -38,33 +38,24 @@ const ctas = [
   data-header-color="#46ecd5"
 >
   <div class="max-w-3xl w-full text-center flex flex-col gap-10">
-    <!-- Título -->
-    <h2 class="text-4xl md:text-5xl font-extrabold tracking-wide">
-      Let's Work <span
-        class="bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent"
-        >Together</span
+    <div class="h-full text-center mb-14">
+      <h1
+        transition:name="contact-title"
+        class="text-4xl sm:text-5xl font-extrabold mb-6 bg-gradient-to-r from-emerald-300 via-teal-200 to-lime-300 bg-clip-text text-transparent"
       >
-    </h2>
-
-    <!-- Slogan -->
-    <p class="text-xl italic opacity-90">
-      “Transforming ideas into <span class="text-pink-400 font-semibold"
-        >scalable</span
-      > and
-      <span class="text-purple-400 font-semibold">impactful</span> solutions.”
-    </p>
-
-    <!-- Texto de contexto -->
-    <p class="text-lg opacity-80">
-      I’m always open to exciting collaborations, freelance projects, or new job
-      opportunities. Reach out through your preferred channel below 👇
-    </p>
-
+        Get in Touch
+      </h1>
+      <p class="text-gray-200 text-lg leading-relaxed">
+        Feel free to reach out for collaborations, freelance projects, or just
+        to say hi ✨
+      </p>
+    </div>
     <!-- CTAs -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
       {
         ctas.map((cta) => (
           <div
+            transition:name={`${cta.icon}-btn-cta`}
             class={`flex rounded-2xl w-full justify-center px-6 py-4 text-xl font-semibold shadow-lg 
                   bg-gradient-to-r ${cta.gradient} 
                   hover:scale-105 hover:shadow-2xl transition-transform text-center cursor-pointer items-center`}

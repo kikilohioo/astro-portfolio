@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import ExperienceTimline from "../components/ExperienceTimline.astro";
+import Terminal from "../components/Terminal.astro";
 
 // src/components/TimelineSection.astro
 
@@ -33,5 +34,6 @@ const experiences = [
 ---
 
 <Layout title="My experience">
+  <Terminal display="minimized" />
   <ExperienceTimline />
 </Layout>

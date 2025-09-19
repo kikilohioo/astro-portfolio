@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import Layout from "../layouts/Layout.astro";
+import Terminal from "../components/Terminal.astro";
 
 const ctas = [
   {
@@ -37,6 +38,7 @@ const ctas = [
     <!-- Header -->
     <div class="max-w-2xl text-center mb-14">
       <h1
+        transition:name="contact-title"
         class="text-4xl sm:text-5xl font-extrabold mb-6 bg-gradient-to-r from-emerald-300 via-teal-200 to-lime-300 bg-clip-text text-transparent"
       >
         Get in Touch
@@ -98,7 +100,8 @@ const ctas = [
 
         <button
           type="submit"
-          class="w-full py-3 px-6 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 font-semibold text-white shadow-lg hover:from-emerald-400 hover:to-teal-300 transition-all duration-300 mt-4"
+          class="w-full py-3 px-6 rounded-lg font-semibold text-white shadow-lg mt-4 bg-gradient-to-r from-emerald-500 via-emerald-500 to-teal-600
+       hover:via-teal-400 cursor-pointer transition-colors duration-500"
         >
           Send Message
         </button>
@@ -109,6 +112,7 @@ const ctas = [
         {
           ctas.map((cta) => (
             <div
+              transition:name={`${cta.icon}-btn-cta`}
               class={`flex rounded-2xl w-full justify-center px-6 py-4 text-xl font-semibold shadow-lg 
                       bg-gradient-to-r ${cta.gradient} 
                       hover:scale-105 hover:shadow-2xl transition-transform text-center cursor-pointer items-center`}
@@ -128,4 +132,5 @@ const ctas = [
       </div>
     </div>
   </section>
+  <Terminal display="minimized" position="right" />
 </Layout>
